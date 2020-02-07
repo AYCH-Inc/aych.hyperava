@@ -60,6 +60,20 @@ function try() {
     "$@" || die "test failed: $*"
 }
 
+cd_check()
+{
+    if [ ! -d "$1" ]; then
+        echo "Directory does not exist!" 1>&2
+        exit 1
+    fi
+
+    cd $1
+    if [ "$?" != "0" ]; then
+	echo "Cannot change to directory $1" 1>&2
+	exit 1
+    fi
+}
+
 # -----------------------------------------------------------------
 # CHECK ENVIRONMENT
 # -----------------------------------------------------------------
@@ -133,7 +147,7 @@ NUM_CORES=1
 # -----------------------------------------------------------------
 
 yell --------------- "COMMON SGX (WORKLOAD & IOHANDLER)" ---------------
-cd $TCF_HOME/common/sgx_workload/
+cd_check $TCF_HOME/common/sgx_workload/
 
 mkdir -p build
 cd build
@@ -141,7 +155,7 @@ try cmake ..
 try make "-j$NUM_CORES"
 
 yell --------------- EXAMPLE WORKLOADS ---------------
-cd $TCF_HOME/examples/apps
+cd_check $TCF_HOME/examples/apps
 
 mkdir -p build
 cd build
@@ -149,7 +163,7 @@ try cmake ..
 try make "-j$NUM_CORES"
 
 yell --------------- COMMON CPP ---------------
-cd $TCF_HOME/common/cpp
+cd_check $TCF_HOME/common/cpp
 
 mkdir -p build
 cd build
@@ -157,7 +171,7 @@ try cmake ..
 try make "-j$NUM_CORES"
 
 yell --------------- TRUSTED WORKER MANAGER COMMON ---------------
-cd $TCF_HOME/tc/sgx/trusted_worker_manager/common
+cd_check $TCF_HOME/tc/sgx/trusted_worker_manager/common
 
 mkdir -p build
 cd build
@@ -165,7 +179,7 @@ try cmake ..
 try make "-j$NUM_CORES"
 
 yell --------------- ENCLAVE ---------------
-cd $TCF_HOME/tc/sgx/trusted_worker_manager/enclave
+cd_check $TCF_HOME/tc/sgx/trusted_worker_manager/enclave
 
 mkdir -p build
 cd build
@@ -173,7 +187,7 @@ try cmake ..
 try make "-j$NUM_CORES"
 
 yell --------------- ENCLAVE BRIDGE---------------
-cd $TCF_HOME/tc/sgx/trusted_worker_manager/enclave_untrusted/enclave_bridge
+cd_check $TCF_HOME/tc/sgx/trusted_worker_manager/enclave_untrusted/enclave_bridge
 
 mkdir -p build
 cd build
@@ -181,29 +195,34 @@ try cmake ..
 try make "-j$NUM_CORES"
 
 yell --------------- EXAMPLES COMMON PYTHON ---------------
-cd $TCF_HOME/common/python
+cd_check $TCF_HOME/common/python
+
 try make "-j$NUM_CORES"
 try make install
 
 yell --------------- ENCLAVE MANAGER ---------------
-cd $TCF_HOME/examples/enclave_manager
+cd_check $TCF_HOME/examples/enclave_manager
+
 try make "-j$NUM_CORES"
 try make install
 
 yell --------------- AVALON SDK ---------------
-cd $TCF_HOME/sdk
+cd_check $TCF_HOME/sdk
+
 try python3 setup.py bdist_wheel
 try pip3 install dist/*.whl
 
 yell --------------- LMDB LISTENER ---------------
-cd $TCF_HOME/examples/shared_kv_storage/db_store/packages
+cd_check $TCF_HOME/examples/shared_kv_storage/db_store/packages
+
 mkdir -p build
 cd build
 try cmake ..
 try make
 
 yell --------------- SHARED KV STORAGE ---------------
-cd $TCF_HOME/examples/shared_kv_storage
+cd_check $TCF_HOME/examples/shared_kv_storage
+
 try make
 try make install
 

@@ -32,7 +32,6 @@ services:
       - avalon-lmdb
 
   avalon-lmdb:
-    container_name: avalon-lmdb
     image: avalon-lmdb:${ISOLATION_ID}
     build:
       context: .
